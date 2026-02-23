@@ -1,10 +1,14 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
 import UseSmoothScroll from './hooks/useSmoothScroll.js';
 import data from '../public/data.js';
-import Detail from './pages/Detail.jsx';
-import Cart from './pages/Cart.jsx';
+//import Detail from './pages/Detail.jsx';
+//import Cart from './pages/Cart.jsx';
+
+// lazy : 필요할 때 import 해주세요. 성능개선.
+const Detail = lazy(() => import('./pages/Detail.jsx'));
+const Cart = lazy(() => import('./pages/Cart.jsx'));
 
 function App() {
   UseSmoothScroll();
@@ -72,68 +76,73 @@ function App() {
       </header>
       <main>
         <div className="inner-container">
-          <Routes>
-            {/* 홈 */}
-            <Route
-              path="/"
-              element={
-                <div>
-                  <h2>Product</h2>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => {
-                      let copy = [...product];
-                      console.log(copy);
-                      copy.sort();
-                      setProduct(copy);
-                    }}
-                  >
-                    정렬
-                  </button>
-                  <div className="list">
-                    {product.map((item, i) => {
-                      return <Product product={item} key={i} />;
-                    })}
-                  </div>
-                  {count < urlList.length && (
-                    <div className="text-center">
-                      <button
-                        onClick={() => {
-                          axios
-                            .get(urlList[count])
-                            .then((result) => {
-                              let copy = [...product, ...result.data];
-                              setProduct(copy);
-                              setCount(count + 1);
-                            })
-                            .catch(() => {
-                              console.log('실패');
-                            });
-                        }}
-                      >
-                        더보기
-                      </button>
-                    </div>
-                  )}
-                  <div style={{ height: '300vh' }}></div>
-                </div>
-              }
-            />
-            {/* 상세페이지 */}
-            <Route path="/detail/:pid" element={<Detail product={product} />} />
-            {/* 장바구니 */}
-            <Route path="/cart" element={<Cart product={product} />} />
-            {/* 이벤트 */}
-            <Route path="/event" element={<Event />}>
+          <Suspense fallback={<div>로딩중....</div>}>
+            <Routes>
+              {/* 홈 */}
               <Route
-                path="one"
-                element={<div>첫 주문시 양배추즙 서비스스</div>}
+                path="/"
+                element={
+                  <div>
+                    <h2>Product</h2>
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => {
+                        let copy = [...product];
+                        console.log(copy);
+                        copy.sort();
+                        setProduct(copy);
+                      }}
+                    >
+                      정렬
+                    </button>
+                    <div className="list">
+                      {product.map((item, i) => {
+                        return <Product product={item} key={i} />;
+                      })}
+                    </div>
+                    {count < urlList.length && (
+                      <div className="text-center">
+                        <button
+                          onClick={() => {
+                            axios
+                              .get(urlList[count])
+                              .then((result) => {
+                                let copy = [...product, ...result.data];
+                                setProduct(copy);
+                                setCount(count + 1);
+                              })
+                              .catch(() => {
+                                console.log('실패');
+                              });
+                          }}
+                        >
+                          더보기
+                        </button>
+                      </div>
+                    )}
+                    <div style={{ height: '300vh' }}></div>
+                  </div>
+                }
               />
-              <Route path="two" element={<div>생일기념 쿠폰받기</div>} />
-            </Route>
-            {/* 404 */}
-            <Route path="*" element={<div>없는 페이지</div>} />
-          </Routes>
+              {/* 상세페이지 */}
+              <Route
+                path="/detail/:pid"
+                element={<Detail product={product} />}
+              />
+              {/* 장바구니 */}
+              <Route path="/cart" element={<Cart product={product} />} />
+              {/* 이벤트 */}
+              <Route path="/event" element={<Event />}>
+                <Route
+                  path="one"
+                  element={<div>첫 주문시 양배추즙 서비스스</div>}
+                />
+                <Route path="two" element={<div>생일기념 쿠폰받기</div>} />
+              </Route>
+              {/* 404 */}
+              <Route path="*" element={<div>없는 페이지</div>} />
+            </Routes>
+          </Suspense>
         </div>
       </main>
       <footer className="flow-gradient">
@@ -168,7 +177,7 @@ function Product(props) {
         </span>
         <h3>{props.product.title}</h3>
         <p>
-          <b>{props.product.price}</b>원
+          <b>{props.product.price}원</b>
         </p>
       </Link>
     </div>
