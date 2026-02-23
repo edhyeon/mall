@@ -1,0 +1,22 @@
+[
+  {
+    "id": 3,
+    "title": "4. 전과목1회접지전단지",
+    "img": "/img/product1.png",
+    "price": 25
+  },
+
+  {
+    "id": 4,
+    "title": "5. 육각연필",
+    "img": "/img/product2.png",
+    "price": 90
+  },
+
+  {
+    "id": 5,
+    "title": "6. 컬러풀하고 유니크한 초코숲 미니무지노트",
+    "img": "/img/product3.png",
+    "price": 100
+  }
+]
